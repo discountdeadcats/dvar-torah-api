@@ -83,10 +83,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 All Torah content should be treated with appropriate respect. Please verify sources and attributions when contributing new material.
 
 ## License
-[Your chosen license]
+GNU General Public License
 
-## Contact
-[Your contact information]
 
 ---
 *This project is meant to help spread Torah learning and understanding. Please use and share the content appropriately.*
