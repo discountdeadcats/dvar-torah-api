@@ -4,8 +4,7 @@ import uvicorn
 import threading
 from pydantic import BaseModel
 from storage import storage, counter, save_storage  # Import storage and save function
-import httpx
-
+import requests
 
 
 app = FastAPI()
@@ -13,31 +12,34 @@ app = FastAPI()
 # Lock to prevent race conditions when modifying storage
 storage_lock = threading.Lock()
 
-# Credit of the divrei Torah goes to https://torah.org/learning/dvartorah/
-# The divrei Torah are from the parshas of the Torah
+def sefariaCalendar():
+    response = requests.get("https://www.sefaria.org/api/calendars", headers={"Accept": "application/json"})
+    response_json = response.json()
+    return response_json
+
+@app.get("/test")
+def test():
+    return {"message": sefariaCalendar()}
 
 
 
-@app.get("/parsha/", description="Returns the weekly parsha.")
-async def parsha():
-    async with httpx.AsyncClient() as client:
-        response = await client.get("https://www.sefaria.org/api/calendars?diaspora=1", headers={"Accept": "application/json"})
-        response_json = response.json()
-    
+
+
+@app.get("/parsha", description="Returns the weekly parsha.")
+def parsha():
     # Look specifically for parashat_hashavua in the calendar items
-    parsha = "Unknown"
-    calendar_items = response_json.get("calendar_items", [])
+    calendar_items = sefariaCalendar()['calendar_items']
     for item in calendar_items:
-        if item.get("category") == "parashat_hashavua" and "displayValue" in item:
-            parsha = item["displayValue"]
-            break
+        if item['title']['en'] == 'Parashat Hashavua':
+            parasha_ref = item['ref'] 
+            parasha_name = item['displayValue']['en']
     
-    return {"parsha": parsha}
+    return {"parsha": parasha_name}
 
 class InputData(BaseModel):
     text: str
 
-@app.post("/add/", description="Adds a new Dvar Torah to storage.")
+@app.post("/add", description="Adds a new Dvar Torah to storage.")
 async def add_entry(data: InputData):
     global counter
     if not data.text.strip():
@@ -49,8 +51,10 @@ async def add_entry(data: InputData):
         save_storage()  # Save updated dictionary to file
 
     return {"message": "Added successfully", "id": counter, "content": data.text}
+# Credit of the divrei Torah goes to https://torah.org/learning/dvartorah/
+# The divrei Torah are from the parshas of the Torah
 
-@app.get("/learn/", description="Returns a random Dvar Torah.")
+@app.get("/learn", description="Returns a random Dvar Torah.")
 async def learn():
     with storage_lock:
         # Get a list of keys that have content
