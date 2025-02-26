@@ -53,21 +53,12 @@ async def learn():
 
 ## Planned Features
 
-### Short Term
 * Add POST endpoint to contribute new Divrei Torah
+* move the dictionary into its own JSON file
 * Add Daf Yomi content and daily updates
-* Add source filtering (Chumash, Prophets, Talmud)
-* Input validation for new submissions
-* Basic authentication for content submission
-
-### Long Term
-* Weekly Parsha insights
-* Multiple language support (Hebrew, English)
-* Categories for different topics (Mussar, Halacha)
-* User accounts for personalized learning
-* API key implementation for security
-* Connection to popular Jewish text APIs (Sefaria)
-
+*  Weekly Parsha insights
+*  Connection to popular Jewish text APIs (Sefaria)
+*  connection to [**Sefaria**](https://www.sefaria.org/texts)
 ## API Endpoints (Planned)
 ```markdown
 GET /learn - Get random Dvar Torah
